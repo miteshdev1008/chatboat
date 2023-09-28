@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #chatbox {
+            width: 600px;
+            height: 450px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #messages {
+            flex: 1;
+            width: 100%;
+            overflow-y: scroll;
+        }
+
+        #input-container {
+            width: 100%;
+            display: flex;
+            margin-top: 10px;
+        }
+
+        #user-input {
+            flex: 1;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        #send-button {
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .user-message {
+            background-color: #99ccff;
+            color: black;
+            margin-top: 10px;
+
+            max-width: 70%;
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        .bot-message {
+            background-color: #f2f2f2;
+            color: black;
+            margin-top: 10px;
+            align-self: flex-start;
+            max-width: 70%;
+            border-radius: 10px;
+            padding: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="chatbox">
+        <h1>How can I help you?</h1>
+        <div id="messages"></div>
+        <div id="input-container">
+            <input type="text" id="user-input" placeholder="Type your message...">
+            <button id="send-button" onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        let socket = io();
+        const messagesDiv = document.getElementById("messages");
+        const userInput = document.getElementById("user-input");
+
+        socket.on('disconnect', () => {
+            alert('socket is disconnected');
+        })
+        // when window gets loaded, a welcome message from the bot
+        window.addEventListener('load', function () {
+            const botMessageDiv = document.createElement("div");
+            botMessageDiv.className = "bot-message";
+            botMessageDiv.textContent = "Hi, my name is Buddy. I'm here to help you 😉";
+            messagesDiv.appendChild(botMessageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            
+        })
+
+        // whenever server responds
+        socket.on("botanswere", (chat) => {
+            const botMessageDiv = document.createElement("div");
+            botMessageDiv.className = "bot-message";
+            botMessageDiv.textContent = chat;
+            messagesDiv.appendChild(botMessageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }); 
+
+        // when we send data to the server
+        function sendMessage() {
+            const userMessage = userInput.value.trim();
+            if (userMessage !== "") {
+                const userMessageDiv = document.createElement("div");
+                userMessageDiv.className = "user-message";
+                userMessageDiv.textContent = userMessage;
+                socket.emit('ask', userMessage); // emitting the event (sending the data)
+                userMessageDiv.style.marginLeft = '250px';
+              
+                // You can also add other styles or classes for a nicer appearance
+                userMessageDiv.style.padding = '10px'; // Add padding for spacing
+                userMessageDiv.style.backgroundColor = '#f0f0f0'; // Set a background color
+                userMessageDiv.style.border = '1px solid #ccc'; // Add a border
+                userMessageDiv.style.borderRadius = '5px'; // Add rounded corners
+                messagesDiv.appendChild(userMessageDiv);
+                userInput.value = "";
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            }
+            // when the user tries to send an empty question
+            else {
+                alert('Enter your question.');
+            }
+        }
+    </script>
+</body>
+
+</html>

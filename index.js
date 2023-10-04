@@ -44,10 +44,7 @@ var data = [{
 }]
 
 
-const apiUrl = 'https://api.openai.com/v1/engines/davinci/completions';
-app.get('/', (req, res) => {
-    res.sendFile('/home/siddharth/code/chat boat/index.html');
-})
+
 
 io.on('connection', (socket) => {
     console.log('A user connected');

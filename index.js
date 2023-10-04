@@ -10,11 +10,7 @@ const cors = require("cors");
 app.use(cors());
 app.use(bp.json());
 
-const OpenAI = require("openai");
 
-const openai = new OpenAI({
-    apiKey: "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",
-});
 
 
 var data = [{
